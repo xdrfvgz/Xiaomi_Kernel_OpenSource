@@ -67,7 +67,7 @@ jobs:
           cd bootimage
 
           # Copy the compiled kernel image
-          cp ../kernel/arch/arm64/boot/Image.gz .
+          cp $GITHUB_WORKSPACE/Image.gz .
 
           # Create a simple ramdisk
           mkdir ramdisk
