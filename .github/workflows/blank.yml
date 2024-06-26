@@ -38,32 +38,26 @@ jobs:
           git clone --depth=1 -b moonstone-s-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
           sudo chmod 777 -R .
           cd kernel
-          #git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 toolchain
           sudo mkdir out
           export ARCH=arm64
           export SUBARCH=arm64
-          export CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android-
+          export CROSS_COMPILE=aarch64-linux-gnu-
           sudo make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gki_defconfig O=out
           sudo make CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j 64 O=out
-          #ARCH=arm64 sudo make O=out gki_defconfig
-          #ARCH=arm64 SUBARCH=arm64 sudo CLANG_TRIPLE=aarch64-linux-gnu- make CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android- -j$(nproc) O=out CC=clang 2>&1 | tee kernel.log
-        - name: Upload Kernel Images
-        #if: env.INSTALLER != 'yes'
-        uses: actions/upload-artifact@v2
-        with:
-          name: kern
-          path: '*.img'
-          if-no-files-found: error
+          
+          # Save the Image.gz and config
+          sudo cp out/arch/arm64/boot/Image.gz $GITHUB_WORKSPACE/
+          sudo cp out/.config $GITHUB_WORKSPACE/config
 
-        uses: actions/upload-artifact@v2
+      # Upload the kernel image and config as artifacts
+      - name: Upload kernel image
+        uses: actions/upload-artifact@v3
         with:
-          name: kern
-          path: '*.gz'
-          if-no-files-found: error
+          name: kernel-image
+          path: $GITHUB_WORKSPACE/Image.gz
 
-      - name: Upload Kernel Info
-        uses: actions/upload-artifact@v2
+      - name: Upload config
+        uses: actions/upload-artifact@v3
         with:
-          name: kern_config
-          path: config.*
-          if-no-files-found: error
+          name: kernel-config
+          path: $GITHUB_WORKSPACE/config
