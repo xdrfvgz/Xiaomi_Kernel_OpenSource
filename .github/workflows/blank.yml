@@ -1,42 +1,32 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "README" branch
   push:
     branches: [ "README" ]
   pull_request:
     branches: [ "README" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Print working directory
+        run: pwd
 
-      # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
 
-      # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
           sudo apt update
           sudo dpkg --add-architecture i386
           sudo apt-get install git gcc-aarch64-linux-gnu gcc-aarch64-linux-gnu clang ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev python3-networkx libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip
+          mkdir kernel_build
+          cd kernel_build
           git clone --depth=1 -b moonstone-s-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
-          sudo chmod 777 -R .
+          sudo chmod 777 -R kernel
           cd kernel
           sudo mkdir out
           export ARCH=arm64
@@ -46,18 +36,17 @@ jobs:
           sudo make CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j 64 O=out
           
           # Save the Image.gz and config
-          sudo cp out/arch/arm64/boot/Image.gz $GITHUB_WORKSPACE/
-          sudo cp out/.config $GITHUB_WORKSPACE/config
+          sudo cp out/arch/arm64/boot/Image.gz ../Image.gz
+          sudo cp out/.config ../config
 
-      # Upload the kernel image and config as artifacts
       - name: Upload kernel image
         uses: actions/upload-artifact@v3
         with:
           name: kernel-image
-          path: out/arch/arm64/boot/Image.gz
+          path: kernel_build/Image.gz
 
       - name: Upload config
         uses: actions/upload-artifact@v3
         with:
           name: kernel-config
-          path: out/.config
+          path: kernel_build/config
