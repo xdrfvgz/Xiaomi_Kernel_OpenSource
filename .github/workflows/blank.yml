@@ -47,3 +47,23 @@ jobs:
           sudo make CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j 64 O=out
           #ARCH=arm64 sudo make O=out gki_defconfig
           #ARCH=arm64 SUBARCH=arm64 sudo CLANG_TRIPLE=aarch64-linux-gnu- make CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android- -j$(nproc) O=out CC=clang 2>&1 | tee kernel.log
+        - name: Upload Kernel Images
+        #if: env.INSTALLER != 'yes'
+        uses: actions/upload-artifact@v2
+        with:
+          name: kern
+          path: '*.img'
+          if-no-files-found: error
+
+        uses: actions/upload-artifact@v2
+        with:
+          name: kern
+          path: '*.gz'
+          if-no-files-found: error
+
+      - name: Upload Kernel Info
+        uses: actions/upload-artifact@v2
+        with:
+          name: kern_config
+          path: config.*
+          if-no-files-found: error
