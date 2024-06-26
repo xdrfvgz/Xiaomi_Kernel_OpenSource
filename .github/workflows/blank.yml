@@ -32,6 +32,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
+          sudo apt update
           sudo apt-get install git ccache automake flex lzop bison \
           gperf build-essential zip curl zlib1g-dev \ 
           g++-multilib python3-networkx libxml2-utils bzip2 libbz2-dev \
