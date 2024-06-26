@@ -54,10 +54,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: kernel-image
-          path: $GITHUB_WORKSPACE/Image.gz
+          path: arch/arm64/boot/Image.gz
 
       - name: Upload config
         uses: actions/upload-artifact@v3
         with:
           name: kernel-config
-          path: $GITHUB_WORKSPACE/config
+          path: arch/arm64/boot/config
