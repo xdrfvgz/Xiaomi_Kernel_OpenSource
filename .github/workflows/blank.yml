@@ -1,5 +1,7 @@
 # This is a basic workflow to help you get started with Actions
 
+# This is a basic workflow to help you get started with Actions
+
 name: CI
 
 # Controls when the workflow will run
@@ -13,7 +15,7 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one  or more jobs that can run sequentially or in parallel
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -24,9 +26,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Runs a set of commands using the runners shell
+      # Runs a set of commands using the runner's shell
       - name: Run a multi-line script
         run: |
+          sudo apt update
+          sudo dpkg --add-architecture i386
+          # Your other commands here
+          # ...
           sudo apt update
           sudo dpkg --add-architecture i386
           sudo apt-get install git gcc-aarch64-linux-gnu gcc-aarch64-linux-gnu clang ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev python3-networkx libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip
