@@ -61,7 +61,7 @@ jobs:
           name: kernel-config
           path: $GITHUB_WORKSPACE/config
 
-          - name: Create boot image
+      - name: Create boot image
         run: |
           mkdir bootimage
           cd bootimage
