@@ -38,10 +38,11 @@ jobs:
           sudo apt-get install gcc-aarch64-linux-gnu # GNU C compiler for the arm64 architecture
           sudo apt-get install g++-aarch64-linux-gnu # GNU C++ compiler
           sudo apt-get install clang ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev python3-networkx libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip
+          cd
           git clone --depth=1 -b moonstone-s-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
-          sudo chmod 777 -R /
+          sudo chmod 777 -R ~
           cd kernel
-          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 toolchain
+         # git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 toolchain
           sudo mkdir out
           export ARCH=arm64
           export SUBARCH=arm64
