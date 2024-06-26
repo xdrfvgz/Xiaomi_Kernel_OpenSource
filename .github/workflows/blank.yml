@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "README" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "README" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -12,41 +12,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print working directory
-        run: pwd
-
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      - name: Run a multi-line script
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo dpkg --add-architecture i386
-          sudo apt-get install git gcc-aarch64-linux-gnu gcc-aarch64-linux-gnu clang ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev python3-networkx libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip
-          mkdir kernel_build
-          cd kernel_build
+          sudo apt install -y git gcc-aarch64-linux-gnu clang ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev python3-networkx libxml2-utils bzip2 libbz2-dev libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip
+          sudo apt install -y cpio
+
+      - name: Clone kernel source
+        run: |
           git clone --depth=1 -b moonstone-s-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git kernel
-          sudo chmod 777 -R kernel
           cd kernel
-          sudo mkdir out
+          sudo chmod -R 777 .
+
+      - name: Build kernel
+        run: |
+          cd kernel
           export ARCH=arm64
-          export SUBARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          sudo make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gki_defconfig O=out
-          sudo make CC=clang ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j 64 O=out
-          
-          # Save the Image.gz and config
-          sudo cp out/arch/arm64/boot/Image.gz ../Image.gz
-          sudo cp out/.config ../config
+          make gki_defconfig
+          make -j$(nproc)
 
-      - name: Upload kernel image
+      - name: Create boot image
+        run: |
+          mkdir bootimage
+          cd bootimage
+
+          # Copy the compiled kernel image
+          cp ../kernel/arch/arm64/boot/Image.gz .
+
+          # Create a simple ramdisk
+          mkdir ramdisk
+          echo "init" > ramdisk/init
+          cd ramdisk
+          find . | cpio -H newc --create > ../ramdisk.cpio
+          cd ..
+          gzip ramdisk.cpio
+          mv ramdisk.cpio.gz ramdisk.img
+
+          # Clone mkbootimg tool and build it
+          git clone https://github.com/osm0sis/mkbootimg.git
+          cd mkbootimg
+          make
+          cd ..
+
+          # Create boot.img
+          ./mkbootimg/mkbootimg --kernel Image.gz --ramdisk ramdisk.img -o boot.img
+
+      - name: Upload boot image
         uses: actions/upload-artifact@v3
         with:
-          name: kernel-image
-          path: kernel_build/Image.gz
-
-      - name: Upload config
-        uses: actions/upload-artifact@v3
-        with:
-          name: kernel-config
-          path: kernel_build/config
+          name: boot-image
+          path: bootimage/boot.img
