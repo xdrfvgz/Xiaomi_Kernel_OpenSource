@@ -43,4 +43,4 @@ jobs:
           export SUBARCH=arm64
           export CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android-
           ARCH=arm64 sudo make O=out gki_defconfig
-          ARCH=arm64 SUBARCH=arm64 sudo CLANG_TRIPLE=aarch64-linux-gnu- make CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android -j$(nproc) O=out CC=clang 2>&1 | tee kernel.log
+          ARCH=arm64 SUBARCH=arm64 sudo CLANG_TRIPLE=aarch64-linux-gnu- make CROSS_COMPILE=${PWD}/toolchain/bin/aarch64-linux-android- -j$(nproc) O=out CC=clang 2>&1 | tee kernel.log
